@@ -22,7 +22,7 @@ def main():
         haberler = open('haberler.txt', 'a+')
         future_to_url = {executor.submit(load_url, url, 15): url for url in
                          URLS}
-        for future in concurrent.futures.as_completed(future_to_url):
+        for future in tqdm(concurrent.futures.as_completed(future_to_url)):
             try:
                 url = future_to_url[future]
                 html = future.result()
