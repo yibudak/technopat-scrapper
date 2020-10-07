@@ -17,22 +17,14 @@ def main():
                          haberler.readlines()}
         for future in tqdm(concurrent.futures.as_completed(future_to_url)):
             try:
-                haberler = open('haberler.txt', 'r')
-                csv_file = open('icerik.csv', 'a+', newline='')
-                header = ['URL', 'DATE', 'TITLE', 'TEXT']
-                writer = csv.DictWriter(csv_file, fieldnames=header)
-                writer.writeheader()
                 url = future_to_url[future]
                 html = future.result()
                 content_table = get_data(html, url)
-                writer.writerow({'URL': url,
-                                 'DATE': content_table[1],
-                                 'TITLE': content_table[2],
-                                 'TEXT': content_table[3]})
+                write_data(content_table)
             except Exception as exc:
                 print('%r generated an exception: %s' % (url, exc))
         haberler.close()
-        csv_file.close()
+
 
 def get_data(html, url):
     # date format: dd-mm-yyyy
@@ -49,6 +41,19 @@ def get_data(html, url):
 
     except IndexError:
         return [url, date, 'no data', 'no data']
+
+
+def write_data(data):
+    csv_file = open('icerik.csv', 'a+', newline='')
+    header = ['URL', 'DATE', 'TITLE', 'TEXT']
+    writer = csv.DictWriter(csv_file, fieldnames=header)
+    writer.writeheader()
+    writer.writerow({'URL': data[0],
+                     'DATE': data[1],
+                     'TITLE': data[2],
+                     'TEXT': data[3]})
+
+    csv_file.close()
 
 
 if __name__ == '__main__':
